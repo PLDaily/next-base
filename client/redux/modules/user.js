@@ -1,6 +1,6 @@
 import { createAction, handleActions } from 'redux-actions';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/fromPromise';
+import * as Rx from 'rxjs'
+import 'rxjs/add/observable/fromPromise'
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
@@ -32,7 +32,7 @@ export const reducers = {
 // epics
 const searchUserEpics = action$ => action$.ofType(FETCH_USER_UPGRADE)
   .mergeMap(action => {
-    const [success, error] = Observable
+    const [success, error] = Rx.Observable
       .fromPromise(new Promise(resolve => resolve({
         success: true,
         data: action.payload
@@ -40,7 +40,7 @@ const searchUserEpics = action$ => action$.ofType(FETCH_USER_UPGRADE)
       .partition(x => x.success);
     const success$ = success.map(x => searchUserSuccess({ ...x.data }));
     const error$ = error.map(x => searchUserFail(x.error));
-    return Observable.merge(success$, error$);
+    return Rx.Observable.merge(success$, error$);
   });
 
 export const epics = [

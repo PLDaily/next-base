@@ -1,11 +1,13 @@
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import { createLogger } from 'redux-logger';
 import { createEpicMiddleware } from 'redux-observable';
 import isPro from '../utils/env';
 import { rootReducers, rootEpics } from './modules';
 
+const epicMiddleware = createEpicMiddleware();
+
 let middlewares = [
-  createEpicMiddleware(rootEpics),
+  epicMiddleware,
 ];
 
 if (!isPro) {
@@ -17,7 +19,8 @@ export default function configureStore(initialState) {
   const store = createStore(
     rootReducers,
     initialState,
-    applyedMiddleware
+    compose(applyedMiddleware)
   );
+  epicMiddleware.run(rootEpics)
   return store;
 }

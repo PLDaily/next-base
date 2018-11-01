@@ -12,7 +12,7 @@ class Index extends React.Component {
   }
   handleClick() {
     this.props.dispatch(searchUser({
-      data: 'pcd'
+      data: 'pcd111'
     }));
   }
   render() {

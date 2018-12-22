@@ -1,10 +1,24 @@
 import { createAction, handleActions } from 'redux-actions';
-import * as Rx from 'rxjs'
-import 'rxjs/add/observable/fromPromise'
+import * as Rx from 'rxjs';
+import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/partition';
+
+export interface State {
+  status: string;
+}
+
+export const initialState: State = {
+  status: ''
+};
+
+interface XProps {
+  success?: boolean;
+  error?: boolean;
+  data?: any;
+}
 
 // actionTypes
 const FETCH_USER_UPGRADE = 'FETCH_USER_UPGRADE';
@@ -18,12 +32,10 @@ export const searchUser = createAction(FETCH_USER_UPGRADE);
 
 // reducers
 const user = handleActions({
-  [FETCH_USER_UPGRADE_SUCCESS]: (state, { payload }) => {
-    console.log({ ...state, ...payload })
-    return { ...state, ...payload }
-  },
+  [FETCH_USER_UPGRADE_SUCCESS]: (state, { payload }) => ({ ...state, ...payload }),
+
   [FETCH_USER_UPGRADE_FAIL]: (state, { payload }) => ({ ...state, ...payload }),
-}, {});
+}, initialState);
 
 export const reducers = {
   user,
@@ -37,9 +49,9 @@ const searchUserEpics = action$ => action$.ofType(FETCH_USER_UPGRADE)
         success: true,
         data: action.payload
       })))
-      .partition(x => x.success);
-    const success$ = success.map(x => searchUserSuccess({ ...x.data }));
-    const error$ = error.map(x => searchUserFail(x.error));
+      .partition((x: XProps) => x.success);
+    const success$ = success.map((x: XProps) => searchUserSuccess({ ...x.data }));
+    const error$ = error.map((x: XProps) => searchUserFail(x.error));
     return Rx.Observable.merge(success$, error$);
   });
 

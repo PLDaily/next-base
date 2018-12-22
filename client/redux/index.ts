@@ -2,25 +2,32 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { createLogger } from 'redux-logger';
 import { createEpicMiddleware } from 'redux-observable';
 import isPro from '../utils/env';
-import { rootReducers, rootEpics } from './modules';
+import isNode from '../utils/isNode';
 
-const epicMiddleware = createEpicMiddleware();
+import { rootEpics, rootReducers } from './modules';
 
 let middlewares = [
-  epicMiddleware,
+  createEpicMiddleware(rootEpics),
 ];
 
-if (!isPro) {
+if (!isPro && !isNode) {
   middlewares = [...middlewares, createLogger({ collapsed: true })];
 }
 
+export let store;
+
 export default function configureStore(initialState) {
-  const applyedMiddleware = applyMiddleware(...middlewares)
-  const store = createStore(
+  const applyedMiddleware = applyMiddleware(...middlewares);
+
+  store = createStore(
     rootReducers,
     initialState,
-    compose(applyedMiddleware)
+    compose(
+      applyedMiddleware,
+      !isPro && !isNode && window.devToolsExtension
+        ? window.devToolsExtension() : f => f
+    )
   );
-  epicMiddleware.run(rootEpics)
+
   return store;
 }

@@ -1,17 +1,18 @@
 import { combineReducers } from 'redux';
 import { combineEpics } from 'redux-observable';
 
-import {
-  reducers as userReducers,
-  epics as userEpics,
-} from './user';
+import * as user from './user';
+
+export interface State {
+  user: user.State;
+}
 
 export const rootReducers = combineReducers({
-  ...userReducers,
+  ...user.reducers,
 });
 
 const allEpics = [
-  ...userEpics,
+  ...user.epics,
 ];
 
 export const rootEpics = combineEpics(...allEpics);

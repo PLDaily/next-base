@@ -1,2 +1,3 @@
 node_modules/
 client/.next/
+yarn-error.log
